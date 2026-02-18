@@ -138,21 +138,27 @@ public class GameManager : MonoBehaviour
 
     public void GameOver(string reason)
     {
-        // Evitiamo di chiamare il Game Over più volte se si muore in contemporanea per due motivi
         if (CurrentState == GameState.GameOver) return; 
 
         CurrentState = GameState.GameOver;
-        Time.timeScale = 0f; // Ferma il mondo di gioco
+        Time.timeScale = 0f; 
 
-        Debug.Log("GAME OVER: " + reason);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySound("GameOver");
+        if (MovementManager.Instance != null) MovementManager.Instance.EnableMovement(false);
         
-        if (AudioManager.Instance != null) 
-            AudioManager.Instance.PlaySound("GameOver");
+        // --- NUOVA PARTE PER IL SALVATAGGIO ---
+        int finalScore = Mathf.FloorToInt(currentScore);
         
-        if (MovementManager.Instance != null)
-            MovementManager.Instance.EnableMovement(false);
-        
+        bool isNewRecord = false;
+        if (SaveManager.Instance != null)
+        {
+            // Salva e scopri se è un nuovo record
+            isNewRecord = SaveManager.Instance.SaveHighScore(finalScore);
+        }
+
         if (UIManager.Instance != null)
-            UIManager.Instance.ShowGameOver(reason, Mathf.FloorToInt(currentScore));
+        {
+            UIManager.Instance.ShowGameOver(reason, finalScore, isNewRecord);
+        }
     }
 }

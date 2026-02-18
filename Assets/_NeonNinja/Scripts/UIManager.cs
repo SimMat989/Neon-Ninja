@@ -16,6 +16,10 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI endScoreText;
     public TextMeshProUGUI endReasonText;
 
+    [Header("High Score Text")]
+    public TextMeshProUGUI menuHighScoreText; // Aggiungi questa variabile
+    public GameObject newRecordAlert;         // Aggiungi un testo/immagine "NUOVO RECORD!" disattivato di base
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -53,7 +57,22 @@ public class UIManager : MonoBehaviour
         scoreText.text = $"Punti: {score}";
     }
 
-    public void ShowGameOver(string reason, int score)
+    public void ShowMenu()
+    {
+        menuPanel.SetActive(true);
+        gameHUD.SetActive(false);
+        pausePanel.SetActive(false);
+        gameOverPanel.SetActive(false);
+
+        // MOSTRA L'HIGH SCORE NEL MENU
+        if (SaveManager.Instance != null)
+        {
+            menuHighScoreText.text = $"Record: {SaveManager.Instance.GetHighScore()}";
+        }
+    }
+
+    // Aggiorniamo la firma del metodo per ricevere il booleano isNewRecord
+    public void ShowGameOver(string reason, int score, bool isNewRecord)
     {
         menuPanel.SetActive(false);
         gameHUD.SetActive(false);
@@ -62,6 +81,12 @@ public class UIManager : MonoBehaviour
 
         endReasonText.text = reason;
         endScoreText.text = $"Punteggio Finale: {score}";
+
+        // ACCENDE IL TESTO "NUOVO RECORD" SE SERVE
+        if (newRecordAlert != null)
+        {
+            newRecordAlert.SetActive(isNewRecord);
+        }
     }
 
     // --- METODI PER I BOTTONI DELL'INTERFACCIA ---
