@@ -8,17 +8,17 @@ public class UIManager : MonoBehaviour
     [Header("Panels")]
     public GameObject menuPanel;
     public GameObject gameHUD;
-    public GameObject pausePanel; // AGGIUNTO: Pannello della pausa
+    public GameObject pausePanel;
     public GameObject gameOverPanel;
 
     [Header("Text Elements")]
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI endScoreText;
     public TextMeshProUGUI endReasonText;
-
-    [Header("High Score Text")]
-    public TextMeshProUGUI menuHighScoreText; // Aggiungi questa variabile
-    public GameObject newRecordAlert;         // Aggiungi un testo/immagine "NUOVO RECORD!" disattivato di base
+    
+    [Header("High Score UI")]
+    public TextMeshProUGUI menuHighScoreText; 
+    public GameObject newRecordAlert; // L'avviso "NUOVO RECORD!"
 
     private void Awake()
     {
@@ -32,6 +32,11 @@ public class UIManager : MonoBehaviour
         gameHUD.SetActive(false);
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(false);
+
+        if (SaveManager.Instance != null && menuHighScoreText != null)
+        {
+            menuHighScoreText.text = $"Record: {SaveManager.Instance.GetHighScore()}";
+        }
     }
 
     public void ShowHUD()
@@ -42,36 +47,16 @@ public class UIManager : MonoBehaviour
         gameOverPanel.SetActive(false);
     }
 
-    /// <summary>
-    /// Viene chiamato dal GameManager quando si preme Esc o P
-    /// </summary>
     public void TogglePauseMenu(bool isPaused)
     {
-        // Accende o spegne il pannello della pausa. 
-        // Nota: lasciamo il gameHUD acceso così si vede in sottofondo!
         pausePanel.SetActive(isPaused);
     }
 
     public void UpdateScoreUI(int score)
     {
-        scoreText.text = $"Punti: {score}";
+        if (scoreText != null) scoreText.text = $"Punti: {score}";
     }
 
-    public void ShowMenu()
-    {
-        menuPanel.SetActive(true);
-        gameHUD.SetActive(false);
-        pausePanel.SetActive(false);
-        gameOverPanel.SetActive(false);
-
-        // MOSTRA L'HIGH SCORE NEL MENU
-        if (SaveManager.Instance != null)
-        {
-            menuHighScoreText.text = $"Record: {SaveManager.Instance.GetHighScore()}";
-        }
-    }
-
-    // Aggiorniamo la firma del metodo per ricevere il booleano isNewRecord
     public void ShowGameOver(string reason, int score, bool isNewRecord)
     {
         menuPanel.SetActive(false);
@@ -79,34 +64,29 @@ public class UIManager : MonoBehaviour
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(true);
 
-        endReasonText.text = reason;
-        endScoreText.text = $"Punteggio Finale: {score}";
+        if (endReasonText != null) endReasonText.text = reason;
+        if (endScoreText != null) endScoreText.text = $"Punteggio Finale: {score}";
 
-        // ACCENDE IL TESTO "NUOVO RECORD" SE SERVE
         if (newRecordAlert != null)
         {
             newRecordAlert.SetActive(isNewRecord);
         }
     }
 
-    // --- METODI PER I BOTTONI DELL'INTERFACCIA ---
+    // --- METODI PER I BOTTONI ---
 
-    // Da collegare al bottone "Gioca" nel Menu Iniziale
     public void OnPlayButton()
     {
-        GameManager.Instance.StartGame();
+        if (GameManager.Instance != null) GameManager.Instance.StartGame();
     }
 
-    // Da collegare al bottone "Riprendi" nel Pannello di Pausa
     public void OnResumeButton()
     {
-        // Diciamo al GameManager di togliere la pausa (lui poi richiamerà TogglePauseMenu(false))
-        GameManager.Instance.TogglePause();
+        if (GameManager.Instance != null) GameManager.Instance.TogglePause();
     }
 
-    // Da collegare al bottone "Riprova" nel Pannello di Game Over
     public void OnRestartButton()
     {
-        GameManager.Instance.RestartGame();
+        if (GameManager.Instance != null) GameManager.Instance.RestartGame();
     }
 }
