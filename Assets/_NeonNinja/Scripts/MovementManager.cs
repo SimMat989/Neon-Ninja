@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections; // Necessario per le Coroutine
 
 public class MovementManager : MonoBehaviour
 {
@@ -16,12 +17,11 @@ public class MovementManager : MonoBehaviour
     public LayerMask groundLayer;
     public Transform groundCheck;
 
-    private bool _canMove = false;
+    private bool _canMove = true; // Impostato a true di base per testare subito
     private bool _isDashing = false;
     private int _jumpCount = 0;
     private const int MaxJumps = 2;
     
-    // Ottimizzazione: salviamo la telecamera
     private Camera _mainCamera; 
 
     private void Awake()
@@ -32,7 +32,6 @@ public class MovementManager : MonoBehaviour
 
     private void Start()
     {
-        // Troviamo la telecamera una volta sola all'avvio
         _mainCamera = Camera.main; 
     }
 
@@ -41,7 +40,7 @@ public class MovementManager : MonoBehaviour
         if (!_canMove || GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
 
         HandleInput();
-        CheckBounds(); // Separato per maggiore pulizia
+        CheckBounds();
     }
 
     public void EnableMovement(bool enable)
@@ -60,16 +59,14 @@ public class MovementManager : MonoBehaviour
             playerRb.linearVelocity = new Vector2(xInput * moveSpeed, playerRb.linearVelocity.y);
         }
 
-        // Salto (Space) - AGGIUNTO: Non puoi saltare mentre fai uno scatto
+        // Salto (Space)
         if (Input.GetKeyDown(KeyCode.Space) && !_isDashing)
         {
-            // Controlla se siamo a terra e in caso resetta i salti
             if (IsGrounded()) 
             {
                 _jumpCount = 0;
             }
 
-            // Se siamo a terra o abbiamo ancora salti disponibili
             if (IsGrounded() || _jumpCount < MaxJumps)
             {
                 PerformJump();
@@ -79,7 +76,6 @@ public class MovementManager : MonoBehaviour
         // Scatto (Shift)
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
         {
-            // AGGIUNTO: Non puoi scattare se lo stai già facendo
             if (!_isDashing) 
             {
                 StartCoroutine(PerformDash(xInput));
@@ -91,57 +87,49 @@ public class MovementManager : MonoBehaviour
     {
         _jumpCount++;
         
-        // Richiedi moltiplicatore al SizeManager
+        // Chiede la forza del salto al SizeManager in base alle dimensioni attuali
         float multiplier = SizeManager.Instance.GetJumpMultiplier();
         float finalForce = baseJumpForce * multiplier;
 
-        // Reset velocità verticale per evitare salti "flosci" se si stava cadendo
         playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, 0); 
         playerRb.AddForce(Vector2.up * finalForce, ForceMode2D.Impulse);
 
-        // Integrazione
-        SizeManager.Instance.ChangeSize(1, playerTransform);
+        // AVVISA IL GAME MANAGER
+        GameManager.Instance.OnPlayerJump(playerTransform);
     }
 
-    private System.Collections.IEnumerator PerformDash(float direction)
+    private IEnumerator PerformDash(float direction)
     {
         _isDashing = true;
         
         float originalGravity = playerRb.gravityScale;
-        playerRb.gravityScale = 0; // Gravità zero durante il dash
-
-        // Reset della velocità verticale per evitare di scattare in diagonale se si stava cadendo
+        playerRb.gravityScale = 0; 
         playerRb.linearVelocity = Vector2.zero; 
 
-        // Se non c'è input, scatta a destra di default
         float dashDir = direction != 0 ? direction : 1f;
         playerRb.linearVelocity = new Vector2(dashDir * dashSpeed, 0);
 
-        // Integrazione
-        SizeManager.Instance.ChangeSize(-1, playerTransform);
+        // AVVISA IL GAME MANAGER
+        GameManager.Instance.OnPlayerDash(playerTransform);
 
         yield return new WaitForSeconds(dashDuration);
 
-        // Ripristino post-scatto
         playerRb.gravityScale = originalGravity;
         _isDashing = false;
     }
 
     private bool IsGrounded()
     {
-        // Raycast verso il basso. (Nota: assicurati che il Layer del player NON sia "groundLayer")
         return Physics2D.Raycast(groundCheck.position, Vector2.down, 0.2f, groundLayer);
     }
 
     private void CheckBounds()
     {
-        // Se cade troppo in basso
         if (playerTransform.position.y < -10f)
         {
             GameManager.Instance.GameOver("Sei caduto nel vuoto!");
         }
 
-        // Se tocca il bordo sinistro della camera
         Vector3 viewPos = _mainCamera.WorldToViewportPoint(playerTransform.position);
         if (viewPos.x < 0)
         {
