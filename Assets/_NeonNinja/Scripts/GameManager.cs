@@ -1,31 +1,92 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // Necessario per ricaricare la scena
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     
-    // 1. Aggiunto lo stato "Paused"
+    // Stati di gioco
     public enum GameState { Menu, Playing, Paused, GameOver }
-    public GameState CurrentState { get; private set; } = GameState.Playing;
+    public GameState CurrentState { get; private set; } = GameState.Menu;
+
+    [Header("Score Settings")]
+    public float scoreMultiplier = 10f; // Quanti punti guadagni al secondo
+    private float currentScore = 0f;
 
     private void Awake()
     {
+        // Setup del Singleton
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        // All'avvio del gioco, partiamo dal Menu
+        CurrentState = GameState.Menu;
+        
+        // Fermiamo il tempo finché il giocatore non preme "Gioca"
+        Time.timeScale = 0f; 
+
+        // Mostriamo il menu iniziale
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowMenu();
+        }
+    }
+
     private void Update()
     {
-        // 2. Controllo dell'input per la pausa
+        // 1. Gestione del punteggio automatico (tipico degli autoscroller)
+        if (CurrentState == GameState.Playing)
+        {
+            currentScore += Time.deltaTime * scoreMultiplier;
+            
+            if (UIManager.Instance != null)
+            {
+                // Convertiamo in int per evitare i decimali nell'interfaccia
+                UIManager.Instance.UpdateScoreUI(Mathf.FloorToInt(currentScore));
+            }
+        }
+
+        // 2. Controllo dell'input per la Pausa
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
         {
-            // Possiamo mettere in pausa solo se stiamo giocando, 
-            // o toglierla se siamo già in pausa (non se siamo in GameOver)
             if (CurrentState == GameState.Playing || CurrentState == GameState.Paused)
             {
                 TogglePause();
             }
         }
+    }
+
+    // --- METODI PER IL FLUSSO DI GIOCO ---
+
+    /// <summary>
+    /// Chiamato dall'UI Manager (Bottone "Gioca" nel menu principale)
+    /// </summary>
+    public void StartGame()
+    {
+        CurrentState = GameState.Playing;
+        currentScore = 0f;
+        Time.timeScale = 1f; // Facciamo ripartire il tempo e la fisica
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowHUD();
+            UIManager.Instance.UpdateScoreUI(0);
+        }
+    }
+
+    /// <summary>
+    /// Chiamato dall'UI Manager (Bottone "Riprova" nel Game Over)
+    /// </summary>
+    public void RestartGame()
+    {
+        // Rimettiamo il tempo a 1 prima di ricaricare, altrimenti la scena riparte congelata!
+        Time.timeScale = 1f; 
+        
+        // Ricarica la scena attuale
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     /// <summary>
@@ -36,64 +97,60 @@ public class GameManager : MonoBehaviour
         if (CurrentState == GameState.Playing)
         {
             CurrentState = GameState.Paused;
+            Time.timeScale = 0f; // Congela il gioco
             
-            // Ferma il tempo del motore fisico e delle animazioni
-            Time.timeScale = 0f; 
-            
-            // Abbassa il volume della musica o mettila in pausa (opzionale)
             if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
                 AudioManager.Instance.musicSource.Pause();
 
-            // Richiama l'UIManager per mostrare la grafica (lo creeremo dopo)
-            // UIManager.Instance.TogglePauseMenu(true); 
-            
-            Debug.Log("Gioco in Pausa");
+            if (UIManager.Instance != null)
+                UIManager.Instance.TogglePauseMenu(true); 
         }
         else if (CurrentState == GameState.Paused)
         {
             CurrentState = GameState.Playing;
+            Time.timeScale = 1f; // Ripristina il gioco
             
-            // Ripristina lo scorrere del tempo
-            Time.timeScale = 1f; 
-            
-            // Fai ripartire la musica
             if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
                 AudioManager.Instance.musicSource.UnPause();
 
-            // Nascondi il menu di pausa
-            // UIManager.Instance.TogglePauseMenu(false); 
-            
-            Debug.Log("Gioco Ripreso");
+            if (UIManager.Instance != null)
+                UIManager.Instance.TogglePauseMenu(false); 
         }
     }
 
-    // --- ALTRI METODI GIA' PRESENTI ---
+    // --- METODI PER LE AZIONI DEL GIOCATORE ---
 
     public void OnPlayerJump(Transform playerTransform)
     {
-        AudioManager.Instance.PlaySound("Jump");
-        SizeManager.Instance.ChangeSize(1, playerTransform);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySound("Jump");
+        if (SizeManager.Instance != null) SizeManager.Instance.ChangeSize(1, playerTransform);
     }
 
     public void OnPlayerDash(Transform playerTransform)
     {
-        AudioManager.Instance.PlaySound("Dash");
-        SizeManager.Instance.ChangeSize(-1, playerTransform);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySound("Dash");
+        if (SizeManager.Instance != null) SizeManager.Instance.ChangeSize(-1, playerTransform);
     }
+
+    // --- SCONFITTA ---
 
     public void GameOver(string reason)
     {
+        // Evitiamo di chiamare il Game Over più volte se si muore in contemporanea per due motivi
+        if (CurrentState == GameState.GameOver) return; 
+
         CurrentState = GameState.GameOver;
-        Time.timeScale = 0f; // Opzionale: ferma tutto anche al Game Over
+        Time.timeScale = 0f; // Ferma il mondo di gioco
 
         Debug.Log("GAME OVER: " + reason);
-        AudioManager.Instance.PlaySound("GameOver");
+        
+        if (AudioManager.Instance != null) 
+            AudioManager.Instance.PlaySound("GameOver");
         
         if (MovementManager.Instance != null)
-        {
             MovementManager.Instance.EnableMovement(false);
-        }
         
-        // UIManager.Instance.ShowGameOverScreen();
+        if (UIManager.Instance != null)
+            UIManager.Instance.ShowGameOver(reason, Mathf.FloorToInt(currentScore));
     }
 }
