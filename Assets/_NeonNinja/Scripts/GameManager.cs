@@ -75,6 +75,8 @@ public class GameManager : MonoBehaviour
             UIManager.Instance.ShowHUD();
             UIManager.Instance.UpdateScoreUI(0);
         }
+        if (LevelManager.Instance != null) 
+        LevelManager.Instance.StartLevelGeneration();
     }
 
     /// <summary>
