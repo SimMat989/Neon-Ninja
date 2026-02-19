@@ -118,7 +118,7 @@ public class MovementManager : MonoBehaviour
         _isDashing = false;
     }
 
-    private bool IsGrounded()
+    public bool IsGrounded()
     {
         return Physics2D.Raycast(groundCheck.position, Vector2.down, 0.2f, groundLayer);
     }
