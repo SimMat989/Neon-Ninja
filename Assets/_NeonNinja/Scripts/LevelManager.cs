@@ -14,6 +14,7 @@ public class LevelManager : MonoBehaviour
     private float currentCameraSpeed;
 
     [Header("Generation Settings")]
+    public Transform initialGroundEnd; // AGGIUNTO: Il punto in cui finisce il tuo pavimento fisso
     public GameObject platformPrefab;
     public Transform generationPoint; // Punto davanti alla camera dove generare (figlio della Camera)
     public float minGap = 2f;
@@ -48,33 +49,55 @@ public class LevelManager : MonoBehaviour
     /// <summary>
     /// Da chiamare nel GameManager dentro StartGame()
     /// </summary>
+    /// 
     public void StartLevelGeneration()
     {
         currentCameraSpeed = initialCameraSpeed;
-        _lastPlatformEndPosition = new Vector3(-5, -2, 0); // Posizione di partenza
-        SpawnPlatform(10f); // Piattaforma iniziale lunga e sicura
+        
+        // 1. Diciamo al sistema di partire da dove finisce il tuo terreno fisso
+        if (initialGroundEnd != null)
+        {
+            // Prende la X e la Y della fine del tuo terreno
+            _lastPlatformEndPosition = initialGroundEnd.position; 
+        }
+        else
+        {
+            // Fallback di sicurezza se ti dimentichi di assegnarlo
+            _lastPlatformEndPosition = new Vector3(-5f, -2f, 0f);
+            SpawnPlatform(10f); 
+        }
+
+        // 2. PRE-GENERAZIONE ISTANTANEA
+        // Genera piattaforme procedurali dalla fine del tuo terreno fino al Generation Point
+        if (generationPoint != null)
+        {
+            while (_lastPlatformEndPosition.x < generationPoint.position.x)
+            {
+                GenerateNextPlatform();
+            }
+        }
     }
 
     private void Update()
     {
         if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
 
-        // Muovi la camera
+        // Muovi la telecamera (e di conseguenza anche il Generation Point che ne è figlio)
         cameraTransform.Translate(Vector3.right * currentCameraSpeed * Time.deltaTime);
         
-        // Aumenta difficoltà fino al limite massimo
         if (currentCameraSpeed < maxCameraSpeed)
         {
             currentCameraSpeed += speedIncreaseRate * Time.deltaTime;
         }
 
-        // Genera nuove piattaforme se ci stiamo avvicinando alla fine dell'ultima
-        if (Vector3.Distance(cameraTransform.position, _lastPlatformEndPosition) < 20f)
+        // 3. IL VERO UTILIZZO DEL GENERATION POINT:
+        // Appena il Generation Point (avanzando) sorpassa la fine dell'ultima piattaforma creata, ne genera un'altra.
+        if (generationPoint != null && _lastPlatformEndPosition.x < generationPoint.position.x)
         {
             GenerateNextPlatform();
         }
 
-        // Ricicla le vecchie piattaforme
+        // Ricicla le piattaforme uscite dallo schermo
         RecyclePlatforms();
     }
 

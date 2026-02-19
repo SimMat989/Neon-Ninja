@@ -22,16 +22,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // All'avvio del gioco, partiamo dal Menu
-        CurrentState = GameState.Menu;
+        // Non partiamo più dal Menu, ma avviamo direttamente il gioco!
+        // StartGame() rimetterà il Time.timeScale a 1 e cambierà lo stato in Playing.
+        StartGame(); 
         
-        // Fermiamo il tempo finché il giocatore non preme "Gioca"
-        Time.timeScale = 0f; 
-
-        // Mostriamo il menu iniziale
-        if (UIManager.Instance != null)
+        // Diciamo al LevelManager di iniziare a generare le piattaforme subito
+        if (LevelManager.Instance != null)
         {
-            UIManager.Instance.ShowMenu();
+            LevelManager.Instance.StartLevelGeneration();
         }
     }
 
