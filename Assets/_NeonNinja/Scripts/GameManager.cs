@@ -130,6 +130,9 @@ public class GameManager : MonoBehaviour
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySound("Dash");
         if (SizeManager.Instance != null) SizeManager.Instance.ChangeSize(-1, playerTransform);
+        
+        // QUESTA RIGA È FONDAMENTALE PER FAR PARTIRE L'ANIMAZIONE
+        if (PlayerAnimationManager.Instance != null) PlayerAnimationManager.Instance.PlayDash();
     }
 
     // --- SCONFITTA ---

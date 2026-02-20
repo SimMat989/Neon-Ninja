@@ -608,6 +608,7 @@ GameObject:
   - component: {fileID: 1014317223}
   - component: {fileID: 1014317226}
   - component: {fileID: 1014317225}
+  - component: {fileID: 1014317227}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -692,17 +693,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0020132065, y: -0.004884243}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.5625, y: 0.96875}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.59331894, y: 0.9614496}
   m_EdgeRadius: 0
 --- !u!212 &1014317224
 SpriteRenderer:
@@ -753,8 +754,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.02641511, g: 0.02641511, b: 0.02641511, a: 1}
+  m_Sprite: {fileID: 21300000, guid: a9f8e0ee6b31edd46930ea3898d1b7df, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -800,6 +801,41 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   groundCheck: {fileID: 2005487783}
+--- !u!114 &1014317227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014317220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5805a79afc5b815479898e7f2dabb45c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationManager
+  spriteRenderer: {fileID: 1014317224}
+  playerRb: {fileID: 1014317222}
+  idleFrames:
+  - {fileID: 21300000, guid: a9f8e0ee6b31edd46930ea3898d1b7df, type: 3}
+  - {fileID: 21300000, guid: 9a5f95de3836e8d438b4e5e6dec9cccf, type: 3}
+  - {fileID: 21300000, guid: 9be75fd594d5ffe419aae080f77373bc, type: 3}
+  - {fileID: 21300000, guid: e5c42b3c250d3384cbf67f9b13b5f745, type: 3}
+  - {fileID: 21300000, guid: 2e607099ab6fa95418f1ed7987973516, type: 3}
+  - {fileID: 21300000, guid: 450bdf7bee5a76d47b155395877e5702, type: 3}
+  runFrames:
+  - {fileID: 21300000, guid: 52190f3e1d5ad394b870354d05d80247, type: 3}
+  - {fileID: 21300000, guid: c6b1082e68b46b340a7d3f6bcfe96dd5, type: 3}
+  - {fileID: 21300000, guid: 6aa27bebd9b2a0945973a61c392bcee7, type: 3}
+  - {fileID: 21300000, guid: a854645dda35a3a429bbcfc8f6a7dac3, type: 3}
+  - {fileID: 21300000, guid: 9f6bfce66b7ef5345b4e9eaee12cc9ec, type: 3}
+  - {fileID: 21300000, guid: 33bf32b0a18ad86448dc02e43decd314, type: 3}
+  - {fileID: 21300000, guid: 4510242bbc3282a4a9f2678954a8cbf1, type: 3}
+  - {fileID: 21300000, guid: 2d16eb935f678204a934b23c28c7a82e, type: 3}
+  jumpFrame: {fileID: 21300000, guid: 6c768d85c52c1e5499cb2d023014e8bc, type: 3}
+  fallFrame: {fileID: 21300000, guid: 3c26a85151d1ec04b8bd97e7f2dea20e, type: 3}
+  dashFrame: {fileID: 21300000, guid: 46d4145fce3a3b647b7824afd02450ce, type: 3}
+  idleFrameRate: 8
+  runFrameRate: 12
 --- !u!1 &1152239383
 GameObject:
   m_ObjectHideFlags: 0
