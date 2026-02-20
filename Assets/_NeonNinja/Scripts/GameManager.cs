@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; // Necessario per ricaricare la scena
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
@@ -66,15 +67,19 @@ public class GameManager : MonoBehaviour
     {
         CurrentState = GameState.Playing;
         currentScore = 0f;
-        Time.timeScale = 1f; // Facciamo ripartire il tempo e la fisica
+        Time.timeScale = 1f;
+
+        // NUOVO: Nascondi e blocca il cursore mentre giochi!
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
         if (UIManager.Instance != null)
         {
             UIManager.Instance.ShowHUD();
             UIManager.Instance.UpdateScoreUI(0);
         }
-        if (LevelManager.Instance != null) 
-        LevelManager.Instance.StartLevelGeneration();
+        
+        if (LevelManager.Instance != null) LevelManager.Instance.StartLevelGeneration();
     }
 
     /// <summary>
@@ -104,8 +109,11 @@ public class GameManager : MonoBehaviour
         if (CurrentState == GameState.Playing)
         {
             CurrentState = GameState.Paused;
-            Time.timeScale = 0f; // Congela il gioco
+            Time.timeScale = 0f; 
             
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+
             if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
                 AudioManager.Instance.musicSource.Pause();
 
@@ -115,8 +123,17 @@ public class GameManager : MonoBehaviour
         else if (CurrentState == GameState.Paused)
         {
             CurrentState = GameState.Playing;
-            Time.timeScale = 1f; // Ripristina il gioco
+            Time.timeScale = 1f; 
             
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
+            // --- NUOVA RIGA: Togliamo il focus dal bottone della UI! ---
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+            }
+
             if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
                 AudioManager.Instance.musicSource.UnPause();
 
@@ -150,6 +167,9 @@ public class GameManager : MonoBehaviour
 
         CurrentState = GameState.GameOver;
         Time.timeScale = 0f; 
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySound("GameOver");
         if (MovementManager.Instance != null) MovementManager.Instance.EnableMovement(false);

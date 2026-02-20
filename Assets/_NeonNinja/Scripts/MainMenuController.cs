@@ -15,6 +15,9 @@ public class MainMenuController : MonoBehaviour
         // Assicuriamoci che il tempo scorra normalmente nel menu
         Time.timeScale = 1f;
 
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
         // Leggiamo l'High Score direttamente dai salvataggi (stessa chiave del SaveManager)
         int score = PlayerPrefs.GetInt("HighScore", 0);
         
