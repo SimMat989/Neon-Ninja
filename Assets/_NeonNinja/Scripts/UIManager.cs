@@ -89,4 +89,10 @@ public class UIManager : MonoBehaviour
     {
         if (GameManager.Instance != null) GameManager.Instance.RestartGame();
     }
+
+    // AGGIUNGI QUESTO NUOVO METODO:
+    public void OnMainMenuButton()
+    {
+        if (GameManager.Instance != null) GameManager.Instance.GoToMainMenu();
+    }
 }

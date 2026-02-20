@@ -78,15 +78,22 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Chiamato dall'UI Manager (Bottone "Riprova" nel Game Over)
+    /// Riavvia la scena attuale (Il livello di gioco)
     /// </summary>
     public void RestartGame()
     {
-        // Rimettiamo il tempo a 1 prima di ricaricare, altrimenti la scena riparte congelata!
-        Time.timeScale = 1f; 
-        
-        // Ricarica la scena attuale
+        Time.timeScale = 1f; // Sblocca il tempo!
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    /// <summary>
+    /// Torna alla scena del Menu Principale
+    /// </summary>
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f; // Sblocca il tempo!
+        // ATTENZIONE: Se la tua scena del menu si chiama in un altro modo, cambialo qui!
+        SceneManager.LoadScene("0_MainMenu"); 
     }
 
     /// <summary>
