@@ -54,7 +54,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateScoreUI(int score)
     {
-        if (scoreText != null) scoreText.text = $"Punti: {score}";
+        if (scoreText != null) scoreText.text = $"Points: {score}";
     }
 
     public void ShowGameOver(string reason, int score, bool isNewRecord)
@@ -65,7 +65,7 @@ public class UIManager : MonoBehaviour
         gameOverPanel.SetActive(true);
 
         if (endReasonText != null) endReasonText.text = reason;
-        if (endScoreText != null) endScoreText.text = $"Punteggio Finale: {score}";
+        if (endScoreText != null) endScoreText.text = $"Final Score: {score}";
 
         if (newRecordAlert != null)
         {
