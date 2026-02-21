@@ -3455,7 +3455,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -3553,9 +3553,9 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.349
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -3649,13 +3649,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c479ba408b10b4ea3cacc65a251a35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  sfxSource: {fileID: 2118514715}
-  musicSource: {fileID: 2118514714}
-  jumpClip: {fileID: 0}
-  dashClip: {fileID: 0}
-  growClip: {fileID: 0}
-  shrinkClip: {fileID: 0}
-  gameOverClip: {fileID: 0}
+  sfxSource: {fileID: 2118514714}
+  musicSource: {fileID: 2118514715}
+  jumpClip: {fileID: 8300000, guid: 7b8347e11ca017249b50c868fe1c7986, type: 3}
+  dashClip: {fileID: 8300000, guid: 218cb1d2432b92b4cbe769214577f536, type: 3}
+  growClip: {fileID: 8300000, guid: e0502b376d0da1e479463ec1e0f21086, type: 3}
+  shrinkClip: {fileID: 8300000, guid: 97d0b92097c8622488f7d0dbd95e239b, type: 3}
+  gameOverClip: {fileID: 8300000, guid: 0c645f2b4d7e96d43b8923baf037f2dd, type: 3}
   normalPitch: 1
   minPitch: 0.6
   maxPitch: 1.5
