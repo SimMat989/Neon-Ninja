@@ -67,11 +67,16 @@ public class GameManager : MonoBehaviour
     {
         CurrentState = GameState.Playing;
         currentScore = 0f;
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; 
 
-        // NUOVO: Nascondi e blocca il cursore mentre giochi!
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        // --- NUOVA RIGA: Resetta il pitch della musica al valore normale (1.0) ---
+        if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
+        {
+            AudioManager.Instance.musicSource.pitch = 1f;
+        }
 
         if (UIManager.Instance != null)
         {
@@ -79,7 +84,10 @@ public class GameManager : MonoBehaviour
             UIManager.Instance.UpdateScoreUI(0);
         }
         
-        if (LevelManager.Instance != null) LevelManager.Instance.StartLevelGeneration();
+        if (LevelManager.Instance != null)
+        {
+            LevelManager.Instance.StartLevelGeneration();
+        }
     }
 
     /// <summary>
@@ -114,8 +122,7 @@ public class GameManager : MonoBehaviour
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
 
-            if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
-                AudioManager.Instance.musicSource.Pause();
+            // ABBIAMO RIMOSSO LA RIGA: AudioManager.Instance.musicSource.Pause();
 
             if (UIManager.Instance != null)
                 UIManager.Instance.TogglePauseMenu(true); 
@@ -128,14 +135,12 @@ public class GameManager : MonoBehaviour
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
 
-            // --- NUOVA RIGA: Togliamo il focus dal bottone della UI! ---
             if (EventSystem.current != null)
             {
                 EventSystem.current.SetSelectedGameObject(null);
             }
 
-            if (AudioManager.Instance != null && AudioManager.Instance.musicSource != null)
-                AudioManager.Instance.musicSource.UnPause();
+            // ABBIAMO RIMOSSO LA RIGA: AudioManager.Instance.musicSource.UnPause();
 
             if (UIManager.Instance != null)
                 UIManager.Instance.TogglePauseMenu(false); 

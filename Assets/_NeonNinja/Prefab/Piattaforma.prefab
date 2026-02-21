@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8488595359305853463}
   - component: {fileID: 2782937377933355703}
   m_Layer: 6
-  m_Name: Prova Piattaforma
+  m_Name: Piattaforma
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
